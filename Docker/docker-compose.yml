@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  tautulli:
+    image: linuxserver/tautulli:latest
+    container_name: tautulli
+    hostname: tautulli
+    restart: unless-stopped
+    volumes:
+      - ../Data/config:/config
+      - ../Data/logs:/logs # Plex Logs, optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Chicago
+    labels:
+      # Traefik Labels
+      - "traefik.enable=true"
+      # HTTPS Labels
+      - "traefik.http.routers.tautulli.rule=Host(`localhost`)" # Domain Name
+      - "traefik.http.routers.tautulli.entrypoints=web-secure"
+      - "traefik.http.routers.tautulli.middlewares=default-headers@file"
+      - "traefik.http.routers.tautulli.service=tautulli"
+      - "traefik.http.routers.tautulli.tls=true"
+      - "traefik.http.services.tautulli.loadbalancer.server.port=8181" # Proxied Port
